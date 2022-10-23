@@ -12,11 +12,38 @@ const Button = ({ text, handleClick}) => {
   )
 }
 
-const FeedbackStat = ({ text, stat }) => {
+const StatisticLine = ({ text, stat }) => {
   return (
-    <div>
-      <p>{text} {stat}</p>
-    </div>
+    <tr>
+      <td>{text}</td>
+      <td>{stat}</td>
+    </tr>
+  )
+}
+
+const Statistics = ({ good, neutral, bad, all}) => {
+  const averageFeedback = () => (good - bad) / all;
+
+  const positiveFeedback = () => `${(good / all) * 100} %`;
+
+  if (all === 0) {
+    return (
+      <div>
+        No feedback given
+      </div>
+    )
+  } 
+  return (
+    <table>
+      <tbody>
+        <StatisticLine text="good" stat={good} />
+        <StatisticLine text="neutral" stat={neutral} />
+        <StatisticLine text="bad" stat={bad} />
+        <StatisticLine text="all" stat={all} />
+        <StatisticLine text="average" stat={averageFeedback()} />
+        <StatisticLine text="positive" stat={positiveFeedback()} />
+      </tbody>
+    </table>
   )
 }
 
@@ -37,16 +64,6 @@ const App = () => {
     setAll(good + neutral + bad + 1);
   }
 
-  const averageFeedback = () => {
-    if (all === 0) {
-      return 0;
-    } else {
-      return (good - bad) / all;
-    }
-  }
-
-  const positiveFeedback = () => `${(good / all) * 100} %`;
-
   return (
     <div>
       <Header header="give feedback" />
@@ -55,12 +72,7 @@ const App = () => {
       <Button text="bad" handleClick={handleFeedbackClick}/>
 
       <Header header="statistics" />
-      <FeedbackStat text="good" stat={good} />
-      <FeedbackStat text="neutral" stat={neutral} />
-      <FeedbackStat text="bad" stat={bad} />
-      <FeedbackStat text="all" stat={all} />
-      <FeedbackStat text="average" stat={averageFeedback()} />
-      <FeedbackStat text="positive" stat={positiveFeedback()} />
+      <Statistics good={good} neutral={neutral} bad={bad} all={all} />
     </div>
   );
 }
