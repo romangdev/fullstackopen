@@ -48,20 +48,20 @@ const App = () => {
   const handleVoteClick = () => {
     const copy = [...points];
     copy[selected] += 1;
-    const mostVotedIndex = getMostVotedIndex();
+    const mostVotedIndex = getMostVotedIndex(copy);
     setTopAnecdote(anecdotes[mostVotedIndex]);
     setTopVoteCount(copy[mostVotedIndex]);
 
     setPoints(copy);
   }
 
-  // BUG HEREEEE!!!! "Delay" in finding highest count
-  const getMostVotedIndex = () => {
+  const getMostVotedIndex = (copy) => {
     let highestVoteCount = 0;
     let index = 0;
+    console.log(copy);
     for (let i = 0; i < anecdotes.length; i++) {
-      if (points[i] > highestVoteCount) {
-        highestVoteCount = points[i];
+      if (copy[i] > highestVoteCount) {
+        highestVoteCount = copy[i];
         index = i;
       }
     }
