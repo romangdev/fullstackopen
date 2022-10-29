@@ -26,10 +26,14 @@ const App = () => {
   }
   , [userCountry])
 
+  const fillCountrySearch = (country) => {
+    setCountryList([country])
+  } 
+
   return (
     <div>
       <CountrySearch getCountryName={getCountryName} userCountry={userCountry} />
-      <CountryResults countryList={countryList} />
+      <CountryResults countryList={countryList} fillCountrySearch={fillCountrySearch} />
       <CountryView countryList={countryList} />
     </div>
   );

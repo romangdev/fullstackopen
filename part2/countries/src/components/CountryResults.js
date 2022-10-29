@@ -1,4 +1,4 @@
-const CountryResults = ({ countryList }) => {
+const CountryResults = ({ countryList, fillCountrySearch }) => {
   return (
     <div>
       {countryList.length > 10 ?
@@ -8,7 +8,7 @@ const CountryResults = ({ countryList }) => {
           return (
             <div key={country.name.common}>
               {country.name.common} 
-              <button>show</button>
+              <button onClick={() => fillCountrySearch(country)}>show</button>
             </div>
           )
         })
