@@ -1,4 +1,4 @@
-const CountryView = ({ countryList }) => {
+const CountryView = ({ countryList, temp, wind, weatherIcon }) => {
   return (
     <div>
       {countryList.length === 1 ?
@@ -15,6 +15,11 @@ const CountryView = ({ countryList }) => {
           <div>
             <img src={countryList[0].flags.png} alt='Country flag'></img>
           </div>
+          <h2>Weather in {countryList[0].capital}</h2>
+          <p>Temperature: {(temp - 273.5).toFixed(1)}°C / {((temp - 273.15) * 9/5 + 32).toFixed(1)}°F</p>
+          <p>Weather:</p>
+          <img src={weatherIcon} alt='current weather icon'></img>
+          <p>Wind: {wind} m/s</p>
         </div>
         :
         <></>
