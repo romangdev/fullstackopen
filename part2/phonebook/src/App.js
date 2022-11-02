@@ -1,10 +1,22 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
+import axios from 'axios'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
-  ]) 
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [nameFilter, setNameFilter] = useState('')
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
 
   const getName = (e) => {
     setNewName(e.target.value)
@@ -16,10 +28,17 @@ const App = () => {
     if (nameExists) {
       alert(`${newName} is already in the phonebook!`)
     } else {
-      setPersons(persons.concat({
-        name: newName
-      }))
+      const baseUrl = 'http://localhost:3001/persons'
+      const newPersonObject = {
+        name: newName,
+        number: newNumber
+      }
+
+      axios.post(baseUrl, newPersonObject)
+
+      setPersons(persons.concat(newPersonObject))
       setNewName('')
+      setNewNumber('')
     }
   }
 
@@ -33,20 +52,29 @@ const App = () => {
     return false;
   }
 
+  const getNumber = (e) => {
+    setNewNumber((e.target.value).toLowerCase())
+  }
+
+  const getFilter = (e) => {
+    setNameFilter(e.target.value)
+  }
+
+  const peopleToShow = persons.filter(person => {
+    const name = person.name.toLowerCase()
+    const subString = nameFilter.toLowerCase()
+    return name.includes(subString) === true
+  })
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          name: <input onChange={getName} value={newName}/>
-        </div>
-        <div>Debug: {newName}</div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <Filter getFilter={getFilter} nameFilter={nameFilter} />
+      <h2>Add New Contact</h2>
+      <PersonForm handleSubmit={handleSubmit} getName={getName} newName={newName}
+      getNumber={getNumber} newNumber={newNumber} />
       <h2>Numbers</h2>
-      {persons.map(person => <div key={person.name}>{person.name}</div>)}
+      <Persons persons={peopleToShow} />
     </div>
   )
 }
