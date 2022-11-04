@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-import axios from 'axios'
+import contactService from "./components/services/contact_services"
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -11,11 +11,9 @@ const App = () => {
   const [nameFilter, setNameFilter] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
-      })
+    contactService
+    .getAll()
+    .then(contacts => setPersons(contacts))
   }, [])
 
   const getName = (e) => {
@@ -28,18 +26,24 @@ const App = () => {
     if (nameExists) {
       alert(`${newName} is already in the phonebook!`)
     } else {
-      const baseUrl = 'http://localhost:3001/persons'
       const newPersonObject = {
         name: newName,
         number: newNumber
       }
 
-      axios.post(baseUrl, newPersonObject)
+      contactService.create(newPersonObject)
 
       setPersons(persons.concat(newPersonObject))
       setNewName('')
       setNewNumber('')
     }
+  }
+
+  const handleDelete = (id) => {
+    contactService.destroy(id)
+    setPersons(persons.filter(person => {
+      return person.id !== id
+    }))
   }
 
   const checkDuplicateName = (newName) => {
@@ -74,7 +78,7 @@ const App = () => {
       <PersonForm handleSubmit={handleSubmit} getName={getName} newName={newName}
       getNumber={getNumber} newNumber={newNumber} />
       <h2>Numbers</h2>
-      <Persons persons={peopleToShow} />
+      <Persons persons={peopleToShow} people={persons} setPeople={setPersons} handleDelete={handleDelete} />
     </div>
   )
 }
