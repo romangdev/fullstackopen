@@ -9,12 +9,13 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [nameFilter, setNameFilter] = useState('')
+  const [contactUpdate, setContactUpdate] = useState(false)
 
   useEffect(() => {
     contactService
     .getAll()
     .then(contacts => setPersons(contacts))
-  }, [])
+  }, [contactUpdate])
 
   const getName = (e) => {
     setNewName(e.target.value)
@@ -23,33 +24,54 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     const nameExists = checkDuplicateName(newName)
-    if (nameExists) {
-      alert(`${newName} is already in the phonebook!`)
+    const nameDoesExist = nameExists[0]
+    const existingPerson = nameExists[1]
+    if (nameDoesExist) {
+      handleNumberUpdate(existingPerson.id)
+      setContactUpdate(!contactUpdate)
     } else {
       const newPersonObject = {
         name: newName,
         number: newNumber
       }
-
       contactService.create(newPersonObject)
-
       setPersons(persons.concat(newPersonObject))
-      setNewName('')
-      setNewNumber('')
+    }
+
+    setNewName('')
+    setNewNumber('')
+  }
+
+  const handleNumberUpdate = (existingPersonID) => {
+    if (window.confirm(`${newName} is already in the phonebook, 
+        replace the old number with a new one?`)) {
+      for (let i = 0; i < persons.length; i++) {
+        if (persons[i].id === existingPersonID) {
+          const updatedContact = {
+            ...persons[i],
+            number: newNumber
+          }
+          contactService.update(updatedContact, persons[i])
+        }
+      }
     }
   }
 
-  const handleDelete = (id) => {
-    contactService.destroy(id)
-    setPersons(persons.filter(person => {
-      return person.id !== id
-    }))
+  const handleDelete = (contact) => {
+    if (window.confirm(`Delete ${contact.name}?`)) {
+      contactService.destroy(contact.id)
+      setPersons(persons.filter(person => {
+        return person.id !== contact.id
+      }))
+    } 
+
+    return
   }
 
   const checkDuplicateName = (newName) => {
     for (let i = 0; i < persons.length; i++) {
       if (persons[i].name === newName) {
-        return true;
+        return [true, persons[i]];
       }
     }
 

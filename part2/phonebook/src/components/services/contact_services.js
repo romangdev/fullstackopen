@@ -15,6 +15,12 @@ const destroy = id => {
   axios.delete(`${baseUrl}/${id}`)
 }
 
-const contactService = { getAll, create, destroy }
+const update = (updatedPerson, originalPerson) => {
+  console.log('udpating')
+  const request = axios.put(`${baseUrl}/${originalPerson.id}`, updatedPerson)
+  return request.then(response => response.data)
+}
+
+const contactService = { getAll, create, destroy, update }
 
 export default contactService

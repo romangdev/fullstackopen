@@ -1,9 +1,19 @@
 {
   "persons": [
     {
-      "name": "Arto Hellas'",
-      "number": "2040-123456314",
+      "name": "Arto Hellas",
+      "number": "3",
       "id": 1
+    },
+    {
+      "name": "Helen BlahBlah",
+      "number": "33",
+      "id": 2
+    },
+    {
+      "name": "Bob Wood",
+      "number": "23134234c423413",
+      "id": 3
     }
   ]
 }
