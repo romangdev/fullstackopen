@@ -3,6 +3,9 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import contactService from "./components/services/contact_services"
+import './index.css'
+import Notification from "./components/Notification"
+import ErrorNotification from "./components/ErrorNotification"
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -10,12 +13,17 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [nameFilter, setNameFilter] = useState('')
   const [contactUpdate, setContactUpdate] = useState(false)
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
+
+  let errorExists = false
 
   useEffect(() => {
+    console.log('USE EFFECT')
     contactService
     .getAll()
     .then(contacts => setPersons(contacts))
-  }, [contactUpdate])
+  }, [])
 
   const getName = (e) => {
     setNewName(e.target.value)
@@ -28,7 +36,18 @@ const App = () => {
     const existingPerson = nameExists[1]
     if (nameDoesExist) {
       handleNumberUpdate(existingPerson.id)
-      setContactUpdate(!contactUpdate)
+      setTimeout(() => {
+        console.log('Error exists', errorExists)
+        if (errorExists) {
+          setErrorMessage(`Contact '${existingPerson.name}' has already been removed from server`)
+          console.log('error set')
+          errorExists = false
+        } else {
+          setContactUpdate(!contactUpdate)
+          setSuccessMessage(`Updated ${existingPerson.name}'s number`)
+          console.log('UPDATE set')
+        }
+      }, 50)
     } else {
       const newPersonObject = {
         name: newName,
@@ -36,10 +55,17 @@ const App = () => {
       }
       contactService.create(newPersonObject)
       setPersons(persons.concat(newPersonObject))
+      setSuccessMessage(`Added ${newPersonObject.name}`)
     }
 
     setNewName('')
     setNewNumber('')
+    setTimeout(() => {
+      setSuccessMessage(null)
+    }, 4000)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 4000)
   }
 
   const handleNumberUpdate = (existingPersonID) => {
@@ -51,7 +77,7 @@ const App = () => {
             ...persons[i],
             number: newNumber
           }
-          contactService.update(updatedContact, persons[i])
+          errorExists = contactService.update(updatedContact, persons[i])
         }
       }
     }
@@ -95,6 +121,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification successMessage={successMessage} />
+      <ErrorNotification errorMessage={errorMessage} />
       <Filter getFilter={getFilter} nameFilter={nameFilter} />
       <h2>Add New Contact</h2>
       <PersonForm handleSubmit={handleSubmit} getName={getName} newName={newName}
