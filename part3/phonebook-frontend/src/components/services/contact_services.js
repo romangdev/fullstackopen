@@ -1,5 +1,5 @@
 import axios from "axios"
-const baseUrl = 'http://localhost:3001/api/persons'
+const baseUrl = '/api/persons'
 
 const getAll = () => {
   const request = axios.get(baseUrl)
@@ -16,7 +16,7 @@ const destroy = id => {
 }
 
 const update = (updatedPerson, originalPerson) => {
-  console.log('udpating')
+  console.log('updating')
   const request = axios.put(`${baseUrl}/${originalPerson.id}`, updatedPerson)
   return request.then(response => response.data).catch(error => {
     console.log('ERROR')
