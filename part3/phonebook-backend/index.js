@@ -3,6 +3,8 @@ const app = express()
 const cors = require('cors')
 
 app.use(cors())
+app.use(express.json())
+app.use(express.static('build'))
 
 let persons = [
   {
@@ -45,7 +47,31 @@ app.delete('/api/persons/:id', (request, response) => {
   response.status(204).end()
 })
 
-const PORT = 3001
+const generateID = () => {
+  const maxID = persons.length > 0
+    ? Math.max(...persons.map(n => n.id))
+    : 0
+  console.log('Max ID', maxID)
+  return maxID + 1
+}
+
+app.post('/api/persons', (request, response) => {
+  const person = request.body
+  if (!person.name || !person.number) {
+    return response.status(400).json({
+      error: 'name or number missing'
+    })
+  }
+  const newPersonObj = {
+    name: person.name,
+    number: person.number,
+    id: generateID()
+  }
+  persons = persons.concat(newPersonObj)
+  response.json(person)
+})
+
+const PORT = process.env.PORT || '8080'
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}`)
 })
